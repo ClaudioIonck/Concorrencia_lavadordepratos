@@ -1,19 +1,26 @@
+import java.util.List;
+
 public class Lavador extends Thread {
+    private List<Prato> sujos;
+    private Escorredor escorredor;
+
+    public Lavador(String nome, List<Prato> sujos, Escorredor escorredor) {
+        super("Lavador " + nome);
+        this.sujos = sujos;
+        this.escorredor = escorredor;
+    }
+
     @Override
     public void run() {
-        while (Pratos.pratosParaLavar > 0) {
-            synchronized (Pratos.escorredor) {
-                while (Pratos.escorredor.size() == 10) {
-                    try {
-                        Pratos.escorredor.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                Pratos.escorredor.add(Pratos.pratosParaLavar--);
-                System.out.println("Lavador lavou um prato. Pratos restantes para lavar: " + Pratos.pratosParaLavar);
-                Pratos.escorredor.notifyAll();
+        while (!sujos.isEmpty()) {
+            Prato p = null;
+            synchronized (sujos) {
+                p = sujos.remove(0);
             }
+            System.out.println(getName() + " lavando " + p);
+            escorredor.colocar(p);
         }
+        escorredor.setFim(true);
+        System.out.println(getName() + " terminou de lavar");
     }
 }

@@ -1,22 +1,39 @@
-public class Main {
-    public static void main(String[] args) {
-        Lavador lavador = new Lavador();
-        Secador secador1 = new Secador();
-        Secador secador2 = new Secador();
+import java.util.ArrayList;
+import java.util.List;
 
-        secador1.setName("Secador 1");
-        secador2.setName("Secador 2");
+public final class Main {
+    private Main() {}
 
-        lavador.start();
-        secador1.start();
-        secador2.start();
+    public static void main(String[] args) throws Exception {
+        List<Prato> sujos = new ArrayList<>();
+        Escorredor escorredor = new Escorredor(10);
+        List<Prato> limpos = new ArrayList<>();
 
-        try {
-            lavador.join();
-            secador1.join();
-            secador2.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        for (int i = 1; i <= 100; i++) {
+            sujos.add(new Prato(i));
         }
+        System.out.println("Sujos: " + sujos);
+        System.out.println("Limpos: " + limpos);
+        Lavador donald = new Lavador("Donald", sujos, escorredor);
+        Enxugador huguinho = new Enxugador("Huguinho", escorredor, limpos);
+        Enxugador zezinho = new Enxugador("Joaozinho", escorredor, limpos);
+        Enxugador luisinho = new Enxugador("Lusinho", escorredor, limpos);
+        donald.setPriority(10); // pode ficar selfish
+        luisinho.setPriority(1); // pode dar starvation
+        // coloca pra ready
+        donald.start();
+        huguinho.start();
+        zezinho.start();
+        luisinho.start();
+        // aguarda terminarem
+        donald.join();
+        huguinho.join();
+        zezinho.join();
+        luisinho.join();
+        System.out.println("Sujos: " + sujos);
+        System.out.println("Limpos: " + limpos);
+        System.out.println(huguinho);
+        System.out.println(zezinho);
+        System.out.println(luisinho);
     }
 }
